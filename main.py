@@ -191,21 +191,6 @@ async def impostasoglia(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # === AVVIO BOT ===
 
 if __name__ == "__main__":
-    import asyncio
-    import logging
-    from keep_alive import keep_alive
-
     logging.basicConfig(level=logging.INFO)
-
-    async def main():
-        app = ApplicationBuilder().token(TOKEN).build()
-        app.add_handler(CommandHandler("start", start))
-        app.add_handler(CommandHandler("pianto", pianto))
-        app.add_handler(CommandHandler("annullapianto", annullapianto))
-        app.add_handler(CommandHandler("riepilogopianti", riepilogopianti))
-        app.add_handler(CommandHandler("resetpianti", resetpianti))
-        app.add_handler(CommandHandler("impostasoglia", impostasoglia))
-        await app.run_polling()
-
-    keep_alive()
-    asyncio.run(main())
+    keep_alive()  # Avvia il server Flask per Render
+    asyncio.run(main())  # Avvia il bot Telegram
