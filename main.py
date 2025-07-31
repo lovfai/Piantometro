@@ -13,11 +13,9 @@ STATS_FILE = "dati_pianti.json"
 
 dati_utenti = {}
 
-
 def salva_dati():
     with open(STATS_FILE, "w") as f:
         json.dump(dati_utenti, f)
-
 
 def carica_dati():
     global dati_utenti
@@ -25,31 +23,24 @@ def carica_dati():
         with open(STATS_FILE, "r") as f:
             dati_utenti = json.load(f)
 
-
 def fibonacci(n):
     a, b = 1, 1
     for _ in range(n):
         a, b = b, a + b
     return a
 
-
 async def is_admin(update: Update) -> bool:
     user_id = update.effective_user.id
     member = await update.effective_chat.get_member(user_id)
-    return member.status in [
-        ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER
-    ]
-
+    return member.status in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER]
 
 async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await is_admin(update):
-        await update.message.reply_text(
-            "Solo gli admin possono usare questo comando.")
+        await update.message.reply_text("Solo gli admin possono usare questo comando.")
         return
 
     if not update.message.reply_to_message:
-        await update.message.reply_text(
-            "Usa /pianto rispondendo a un messaggio.")
+        await update.message.reply_text("Usa /pianto rispondendo a un messaggio.")
         return
 
     user = update.message.reply_to_message.from_user
@@ -92,16 +83,13 @@ async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     salva_dati()
     await update.message.reply_text(messaggio)
 
-
 async def annullapianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await is_admin(update):
-        await update.message.reply_text(
-            "Solo gli admin possono usare questo comando.")
+        await update.message.reply_text("Solo gli admin possono usare questo comando.")
         return
 
     if not update.message.reply_to_message:
-        await update.message.reply_text(
-            "Usa /annullapianto rispondendo al messaggio da annullare.")
+        await update.message.reply_text("Usa /annullapianto rispondendo al messaggio da annullare.")
         return
 
     user = update.message.reply_to_message.from_user
@@ -120,7 +108,6 @@ async def annullapianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     salva_dati()
 
-
 async def riepilogopianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not dati_utenti:
         await update.message.reply_text("Nessuno ha ancora pianto.")
@@ -129,8 +116,7 @@ async def riepilogopianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
     riepilogo = "📊 Riepilogo Pianti Attuali:\n"
     for user_id, info in dati_utenti.items():
         try:
-            user = await context.bot.get_chat_member(update.effective_chat.id,
-                                                     int(user_id))
+            user = await context.bot.get_chat_member(update.effective_chat.id, int(user_id))
             nome = user.user.first_name
         except:
             nome = "Utente sconosciuto"
@@ -139,11 +125,9 @@ async def riepilogopianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(riepilogo)
 
-
 async def resetpianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await is_admin(update):
-        await update.message.reply_text(
-            "Solo gli admin possono usare questo comando.")
+        await update.message.reply_text("Solo gli admin possono usare questo comando.")
         return
 
     messaggio = "🔄 Nuova stagione iniziata:\n"
@@ -184,7 +168,6 @@ async def resetpianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
     salva_dati()
     await update.message.reply_text(messaggio, parse_mode="HTML")
 
-
 # === AVVIO BOT ===
 async def main():
     carica_dati()
@@ -200,13 +183,21 @@ async def main():
     await app.start()
     await app.updater.start_polling()
 
-
 if __name__ == "__main__":
     import asyncio
     import logging
+    from threading import Thread
     from keep_alive import keep_alive
 
     logging.basicConfig(level=logging.INFO)
-    keep_alive()
 
-    asyncio.run(main())
+    # Avvia Flask in un thread separato
+    t = Thread(target=keep_alive)
+    t.start()
+
+    try:
+        asyncio.run(main())
+    except RuntimeError:
+        loop = asyncio.get_event_loop()
+        loop.create_task(main())
+        loop.run_forever()
