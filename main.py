@@ -179,15 +179,19 @@ async def main():
     app.add_handler(CommandHandler("resetpianti", resetpianti))
 
     print("Piantometro in esecuzione...")
-    await app.run_polling()  # run_polling include già start(), initialize(), stop()
+    await app.run_polling()
 
-if __name__ == "__main__":
-    import asyncio
-    import logging
-    from keep_alive import keep_alive
+# Avvio
+import logging
+import asyncio
+from keep_alive import keep_alive
 
-    logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
-    keep_alive()  # server Flask per UptimeRobot
+keep_alive()  # Avvia il server Flask per UptimeRobot
 
-    asyncio.run(main())  # Avvia il bot senza blocchi dopo
+async def start():
+    await main()
+
+asyncio.get_event_loop().create_task(start())
+asyncio.get_event_loop().run_forever()
