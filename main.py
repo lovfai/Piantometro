@@ -169,31 +169,32 @@ async def resetpianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(messaggio, parse_mode="HTML")
 
 # === AVVIO BOT ===
-async def main():
-    carica_dati()
-    application = ApplicationBuilder().token(TOKEN).build()
-
-    application.add_handler(CommandHandler("pianto", pianto))
-    application.add_handler(CommandHandler("annullapianto", annullapianto))
-    application.add_handler(CommandHandler("riepilogopianti", riepilogopianti))
-    application.add_handler(CommandHandler("resetpianti", resetpianti))
-
-    print("Piantometro in esecuzione...")
-    await application.initialize()
-    await application.start()
-    await application.updater.start_polling()
-
-# Avvio
-import logging
 import asyncio
+import logging
 from keep_alive import keep_alive
 
-logging.basicConfig(level=logging.INFO)
+async def main():
+    carica_dati()
 
-keep_alive()  # Avvia il server Flask per UptimeRobot
+    app = ApplicationBuilder().token(TOKEN).build()
 
-async def start():
-    await main()
+    app.add_handler(CommandHandler("pianto", pianto))
+    app.add_handler(CommandHandler("annullapianto", annullapianto))
+    app.add_handler(CommandHandler("riepilogopianti", riepilogopianti))
+    app.add_handler(CommandHandler("resetpianti", resetpianti))
 
-asyncio.get_event_loop().create_task(start())
-asyncio.get_event_loop().run_forever()
+    print("Piantometro in esecuzione...")
+    await app.initialize()
+    await app.start()
+
+    # Mantiene il bot attivo finché il processo è in vita
+    await asyncio.Event().wait()
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+
+    keep_alive()  # Avvia il server Flask per Render + UptimeRobot
+
+    loop = asyncio.get_event_loop()
+    loop.create_task(main())   # Avvia il bot
+    loop.run_forever()         # Mantiene il processo attivo
