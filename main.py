@@ -186,18 +186,17 @@ async def main():
 if __name__ == "__main__":
     import asyncio
     import logging
-    from threading import Thread
     from keep_alive import keep_alive
+    import time
 
     logging.basicConfig(level=logging.INFO)
 
-    # Avvia Flask in un thread separato
-    t = Thread(target=keep_alive)
-    t.start()
+    keep_alive()  # Avvia Flask direttamente
 
     try:
-        asyncio.run(main())
-    except RuntimeError:
-        loop = asyncio.get_event_loop()
-        loop.create_task(main())
-        loop.run_forever()
+        asyncio.run(main())  # Avvia il bot Telegram
+    except Exception as e:
+        print("Errore nel bot:", e)
+
+    while True:
+        time.sleep(10)  # Mantiene il processo attivo
