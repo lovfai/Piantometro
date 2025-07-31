@@ -5,6 +5,8 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from telegram.constants import ChatMemberStatus
 from datetime import datetime, timedelta
 from keep_alive import keep_alive
+import logging
+import asyncio
 
 # === CONFIGURAZIONE BASE ===
 TOKEN = "8349278486:AAEmkSGmlH71pbRjGlEd3sQcNwxgm5CEN90"
@@ -34,6 +36,7 @@ async def is_admin(update: Update) -> bool:
     member = await update.effective_chat.get_member(user_id)
     return member.status in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER]
 
+# --- Comandi ---
 async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await is_admin(update):
         await update.message.reply_text("Solo gli admin possono usare questo comando.")
@@ -169,12 +172,10 @@ async def resetpianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(messaggio, parse_mode="HTML")
 
 # === AVVIO BOT ===
-import asyncio
-import logging
-from keep_alive import keep_alive
-
-async def main():
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     carica_dati()
+    keep_alive()
 
     app = ApplicationBuilder().token(TOKEN).build()
 
@@ -184,17 +185,4 @@ async def main():
     app.add_handler(CommandHandler("resetpianti", resetpianti))
 
     print("Piantometro in esecuzione...")
-    await app.initialize()
-    await app.start()
-
-    # Mantiene il bot attivo finché il processo è in vita
-    await asyncio.Event().wait()
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-
-    keep_alive()  # Avvia il server Flask per Render + UptimeRobot
-
-    loop = asyncio.get_event_loop()
-    loop.create_task(main())   # Avvia il bot
-    loop.run_forever()         # Mantiene il processo attivo
+    app.run_polling()
