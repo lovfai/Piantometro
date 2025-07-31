@@ -61,7 +61,10 @@ async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pianti = dati_utenti[user_id]["pianti"]
     soglia = dati_utenti[user_id]["soglia"]
 
-    messaggio = f"{nome} ha pianto {pianti} volta{'e' if pianti != 1 else ''}."
+volta_txt = "volta" if pianti == 1 else "volte"
+messaggio = f"{nome} ha pianto {pianti} {volta_txt}."
+
+
 
     if pianti == soglia:
         messaggio += f" {nome} ha terminato i pianti a disposizione."
@@ -78,7 +81,9 @@ async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ChatPermissions(can_send_messages=False),
                 until_date=until_date,
             )
-            messaggio += f" Ha superato il limite stagionale. Sarà muto per {durata_ore} ora{'e' if durata_ore != 1 else ''}."
+ora_txt = "ora" if durata_ore == 1 else "ore"
+messaggio += f" Ha superato il limite stagionale. Sarà muto per {durata_ore} {ora_txt}."
+
         except:
             messaggio += " ⚠️ Non è stato possibile applicare il mute (forse il bot non è admin?)."
 
