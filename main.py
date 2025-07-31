@@ -6,7 +6,6 @@ from telegram.constants import ChatMemberStatus
 from datetime import datetime, timedelta
 from keep_alive import keep_alive
 import logging
-import asyncio
 
 # === CONFIGURAZIONE BASE ===
 TOKEN = "8349278486:AAEmkSGmlH71pbRjGlEd3sQcNwxgm5CEN90"
@@ -79,7 +78,7 @@ async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ChatPermissions(can_send_messages=False),
                 until_date=until_date,
             )
-            messaggio += f" Ha superato il limite stagionale. Sarà muto per {durata_ore} ora{'e' if durata_ore > 1 else ''}."
+            messaggio += f" Ha superato il limite stagionale. Sarà muto per {durata_ore} ora{'e' if durata_ore != 1 else ''}."
         except:
             messaggio += " ⚠️ Non è stato possibile applicare il mute (forse il bot non è admin?)."
 
@@ -104,7 +103,7 @@ async def annullapianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
         pianti_rimanenti = dati_utenti[user_id]["pianti"]
         soglia = dati_utenti[user_id]["soglia"]
         await update.message.reply_text(
-            f"Pianto annullato per {nome}. Ora ha {pianti_rimanenti} pianto{'i' if pianti_rimanenti != 1 else ''} su {soglia}."
+            f"Pianto annullato per {nome}. Ora ha {pianti_rimanenti} piant{'i' if pianti_rimanenti != 1 else 'o'} su {soglia}."
         )
     else:
         await update.message.reply_text(f"{nome} non ha pianti da annullare.")
@@ -124,7 +123,7 @@ async def riepilogopianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except:
             nome = "Utente sconosciuto"
 
-        riepilogo += f"{nome}: {info['pianti']} pianto{'i' if info['pianti'] != 1 else ''} (soglia {info['soglia']})\n"
+        riepilogo += f"{nome}: {info['pianti']} piant{'i' if info['pianti'] != 1 else 'o'} (soglia {info['soglia']})\n"
 
     await update.message.reply_text(riepilogo)
 
