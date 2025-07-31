@@ -191,12 +191,13 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
 
-    keep_alive()  # Avvia Flask direttamente
+    keep_alive()  # Avvia il server Flask (necessario per Render/UptimeRobot)
 
     try:
         asyncio.run(main())  # Avvia il bot Telegram
     except Exception as e:
         print("Errore nel bot:", e)
 
+    # Mantiene attivo il processo
     while True:
-        time.sleep(10)  # Mantiene il processo attivo
+        time.sleep(10)
