@@ -179,25 +179,18 @@ async def main():
     app.add_handler(CommandHandler("resetpianti", resetpianti))
 
     print("Piantometro in esecuzione...")
-    await app.initialize()
-    await app.start()
-    await app.updater.start_polling()
+    await app.run_polling()  # Avvia il polling per ricevere aggiornamenti da Telegram
 
 if __name__ == "__main__":
     import asyncio
     import logging
     from keep_alive import keep_alive
-    import time
 
     logging.basicConfig(level=logging.INFO)
 
-    keep_alive()  # Avvia il server Flask (necessario per Render/UptimeRobot)
+    keep_alive()  # Avvia il server Flask (necessario per tenerlo attivo su Render/UptimeRobot)
 
     try:
         asyncio.run(main())  # Avvia il bot Telegram
     except Exception as e:
         print("Errore nel bot:", e)
-
-    # Mantiene attivo il processo
-    while True:
-        time.sleep(10)
