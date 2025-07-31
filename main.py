@@ -202,12 +202,16 @@ async def main():
     application.add_handler(CommandHandler("resetpianti", resetpianti))
     application.add_handler(CommandHandler("impostasoglia", impostasoglia))
 
-    await application.run_polling()
+    await application.initialize()
+    await application.start()
+    await application.updater.start_polling()
+    print("✅ Piantometro avviato.")
 
 if __name__ == "__main__":
-    import logging
-    import asyncio
-
     logging.basicConfig(level=logging.INFO)
-    keep_alive()  # Avvia il server Flask per Render
-    asyncio.run(main())  # Avvia il bot Telegram
+    keep_alive()
+
+    import asyncio
+    loop = asyncio.get_event_loop()
+    loop.create_task(main())
+    loop.run_forever()
