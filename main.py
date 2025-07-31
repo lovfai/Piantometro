@@ -171,15 +171,17 @@ async def resetpianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # === AVVIO BOT ===
 async def main():
     carica_dati()
-    app = ApplicationBuilder().token(TOKEN).build()
+    application = ApplicationBuilder().token(TOKEN).build()
 
-    app.add_handler(CommandHandler("pianto", pianto))
-    app.add_handler(CommandHandler("annullapianto", annullapianto))
-    app.add_handler(CommandHandler("riepilogopianti", riepilogopianti))
-    app.add_handler(CommandHandler("resetpianti", resetpianti))
+    application.add_handler(CommandHandler("pianto", pianto))
+    application.add_handler(CommandHandler("annullapianto", annullapianto))
+    application.add_handler(CommandHandler("riepilogopianti", riepilogopianti))
+    application.add_handler(CommandHandler("resetpianti", resetpianti))
 
     print("Piantometro in esecuzione...")
-    await app.run_polling()
+    await application.initialize()
+    await application.start()
+    await application.updater.start_polling()
 
 # Avvio
 import logging
