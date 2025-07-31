@@ -35,7 +35,7 @@ async def is_admin(update: Update) -> bool:
     member = await update.effective_chat.get_member(user_id)
     return member.status in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER]
 
-# --- Comandi ---
+# === COMANDI ===
 async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await is_admin(update):
         await update.message.reply_text("Solo gli admin possono usare questo comando.")
@@ -61,10 +61,8 @@ async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pianti = dati_utenti[user_id]["pianti"]
     soglia = dati_utenti[user_id]["soglia"]
 
-volta_txt = "volta" if pianti == 1 else "volte"
-messaggio = f"{nome} ha pianto {pianti} {volta_txt}."
-
-
+    volta_txt = "volta" if pianti == 1 else "volte"
+    messaggio = f"{nome} ha pianto {pianti} {volta_txt}."
 
     if pianti == soglia:
         messaggio += f" {nome} ha terminato i pianti a disposizione."
@@ -81,9 +79,8 @@ messaggio = f"{nome} ha pianto {pianti} {volta_txt}."
                 ChatPermissions(can_send_messages=False),
                 until_date=until_date,
             )
-ora_txt = "ora" if durata_ore == 1 else "ore"
-messaggio += f" Ha superato il limite stagionale. Sarà muto per {durata_ore} {ora_txt}."
-
+            ora_txt = "ora" if durata_ore == 1 else "ore"
+            messaggio += f" Ha superato il limite stagionale. Sarà muto per {durata_ore} {ora_txt}."
         except:
             messaggio += " ⚠️ Non è stato possibile applicare il mute (forse il bot non è admin?)."
 
@@ -107,8 +104,9 @@ async def annullapianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
         dati_utenti[user_id]["pianti"] -= 1
         pianti_rimanenti = dati_utenti[user_id]["pianti"]
         soglia = dati_utenti[user_id]["soglia"]
+        pianto_txt = "pianto" if pianti_rimanenti == 1 else "pianti"
         await update.message.reply_text(
-            f"Pianto annullato per {nome}. Ora ha {pianti_rimanenti} piant{'i' if pianti_rimanenti != 1 else 'o'} su {soglia}."
+            f"Pianto annullato per {nome}. Ora ha {pianti_rimanenti} {pianto_txt} su {soglia}."
         )
     else:
         await update.message.reply_text(f"{nome} non ha pianti da annullare.")
@@ -128,7 +126,8 @@ async def riepilogopianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except:
             nome = "Utente sconosciuto"
 
-        riepilogo += f"{nome}: {info['pianti']} piant{'i' if info['pianti'] != 1 else 'o'} (soglia {info['soglia']})\n"
+        pianto_txt = "pianto" if info["pianti"] == 1 else "pianti"
+        riepilogo += f"{nome}: {info['pianti']} {pianto_txt} (soglia {info['soglia']})\n"
 
     await update.message.reply_text(riepilogo)
 
