@@ -36,6 +36,9 @@ def fibonacci(n):
         a, b = b, a + b
     return a
 
+def plurale(n, singolare, plurale):
+    return singolare if n == 1 else plurale
+
 async def is_admin(update: Update) -> bool:
     user_id = update.effective_user.id
     member = await update.effective_chat.get_member(user_id)
@@ -71,7 +74,7 @@ async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pianti = dati[user_id]["pianti"]
     soglia = dati[user_id]["soglia"]
 
-    messaggio = f"{nome} ha pianto {pianti} volte."
+    messaggio = f"{nome} ha pianto {pianti} {plurale(pianti, 'volta', 'volte')}."
 
     if pianti == soglia:
         messaggio += f" {nome} ha terminato i pianti a disposizione."
@@ -88,7 +91,7 @@ async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ChatPermissions(can_send_messages=False),
                 until_date=until_date,
             )
-            messaggio += f" Sarà mutato per {durata_ore} ore."
+            messaggio += f" Sarà mutato per {durata_ore} {plurale(durata_ore, 'ora', 'ore')}."
         except:
             messaggio += " ⚠️ Non è stato possibile applicare il mute."
 
