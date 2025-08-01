@@ -209,23 +209,22 @@ async def main():
     application.add_handler(CommandHandler("resetpianti", resetpianti))
     application.add_handler(CommandHandler("impostasoglia", impostasoglia))
 
-    await application.initialize()
-    await application.start()
+    # URL pubblico del tuo bot su Render
+    WEBHOOK_URL = "https://piantometro.onrender.com"  # <-- assicurati che sia esatto
 
-    # === Imposta Webhook per Render ===
-    url = "https://piantometro.onrender.com"  # 🔁 Cambia solo se hai un URL diverso
-    await application.bot.set_webhook(url + "/" + TOKEN)
+    await application.bot.delete_webhook(drop_pending_updates=True)
+    await application.start()
+    await application.bot.set_webhook(url=WEBHOOK_URL)
     await application.updater.start_webhook(
         listen="0.0.0.0",
-        port=10000,
-        url_path=TOKEN,
-        webhook_url=url + "/" + TOKEN,
+        port=int(os.environ.get("PORT", 8080)),
+        url_path="",
+        webhook_url=WEBHOOK_URL,
     )
+    print("✅ Piantometro avviato in modalità webhook.")
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     keep_alive()
 
-    loop = asyncio.get_event_loop()
-    loop.create_task(main())
-    loop.run_forever()
+    asyncio.run(main())
