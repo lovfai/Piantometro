@@ -199,38 +199,28 @@ async def impostasoglia(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # === AVVIO BOT ===
 
-from fastapi import FastAPI, Request
-from telegram.ext import Application
-from telegram import Update
-import uvicorn
+async def main():
+    application = ApplicationBuilder().token(TOKEN).build()
 
-app_fastapi = FastAPI()
-application = Application.builder().token(TOKEN).build()
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("pianto", pianto))
+    application.add_handler(CommandHandler("annullapianto", annullapianto))
+    application.add_handler(CommandHandler("riepilogopianti", riepilogopianti))
+    application.add_handler(CommandHandler("resetpianti", resetpianti))
+    application.add_handler(CommandHandler("impostasoglia", impostasoglia))
 
-application.add_handler(CommandHandler("start", start))
-application.add_handler(CommandHandler("pianto", pianto))
-application.add_handler(CommandHandler("annullapianto", annullapianto))
-application.add_handler(CommandHandler("riepilogopianti", riepilogopianti))
-application.add_handler(CommandHandler("resetpianti", resetpianti))
-application.add_handler(CommandHandler("impostasoglia", impostasoglia))
+    # Avvio Webhook
+    WEBHOOK_URL = "https://piantometro.onrender.com"
 
-@app_fastapi.post("/")
-async def webhook_handler(request: Request):
-    data = await request.json()
-    update = Update.de_json(data, application.bot)
-    await application.update_queue.put(update)
-    return {"ok": True}
+    await application.bot.delete_webhook(drop_pending_updates=True)
+    await application.start()
+    await application.bot.set_webhook(WEBHOOK_URL)
+
+    print("✅ Webhook impostato correttamente.")
+
+    await application.wait_until_closed()
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     keep_alive()
-
-    async def start():
-        await application.bot.delete_webhook(drop_pending_updates=True)
-        await application.initialize()
-        await application.start()
-        await application.bot.set_webhook(url="https://piantometro.onrender.com")
-        print("✅ Webhook impostato correttamente.")
-
-    asyncio.run(start())
-    uvicorn.run(app_fastapi, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    asyncio.run(main())
