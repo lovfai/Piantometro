@@ -213,14 +213,14 @@ async def main():
 
     await application.bot.delete_webhook(drop_pending_updates=True)
 
-    # keep_alive deve partire prima
+    # Avvia il server Flask prima del webhook
     keep_alive()
 
-    # Avvio con webhook (senza asyncio.run)
+    # Avvio in modalità webhook (parametro corretto: path)
     await application.run_webhook(
         listen="0.0.0.0",
         port=int(os.environ.get("PORT", 8080)),
-        webhook_path="/",
+        path="/",
         webhook_url=WEBHOOK_URL,
     )
 
