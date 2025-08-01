@@ -199,7 +199,10 @@ async def impostasoglia(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # === AVVIO BOT ===
 
-async def main():
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    keep_alive()
+
     application = ApplicationBuilder().token(TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
@@ -209,18 +212,4 @@ async def main():
     application.add_handler(CommandHandler("resetpianti", resetpianti))
     application.add_handler(CommandHandler("impostasoglia", impostasoglia))
 
-    # URL pubblico del bot (Render)
-    WEBHOOK_URL = "https://piantometro.onrender.com"
-
-    # Imposta il webhook
-    await application.bot.delete_webhook(drop_pending_updates=True)
-    await application.bot.set_webhook(url=WEBHOOK_URL)
-
-    # Avvia il bot
-    await application.start()
-    await application.wait_closed()
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    keep_alive()
-    asyncio.run(main())
+    application.run_polling()
