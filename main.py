@@ -211,8 +211,16 @@ async def main():
 
     await application.initialize()
     await application.start()
-    await application.updater.start_polling()
-    print("✅ Piantometro avviato.")
+
+    # === Imposta Webhook per Render ===
+    url = "https://piantometro.onrender.com"  # 🔁 Cambia solo se hai un URL diverso
+    await application.bot.set_webhook(url + "/" + TOKEN)
+    await application.updater.start_webhook(
+        listen="0.0.0.0",
+        port=10000,
+        url_path=TOKEN,
+        webhook_url=url + "/" + TOKEN,
+    )
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
