@@ -48,10 +48,13 @@ def è_bot(update: Update):
 # === COMANDI ===
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("🤖 Ciao! Sono il Piantometro. Conteggio i pianti e gestisco le soglie nel gruppo. Scrivi /riepilogopianti per iniziare!")
+    await update.message.reply_text("🤖 Ciao! Sono il Piantometro. Conteggio e gestisco i pianti nel gruppo. Scrivi /riepilogopianti per iniziare!")
 
 async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not await is_admin(update) or not update.message.reply_to_message or è_bot(update):
+    if not await is_admin(update) or not update.message.reply_to_message:
+        return
+    if è_bot(update):
+        await update.message.reply_text("⚠️ Questo comando non può essere usato su un bot.")
         return
 
     chat_id = str(update.effective_chat.id)
@@ -85,7 +88,7 @@ async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ChatPermissions(can_send_messages=False),
                 until_date=until_date,
             )
-            messaggio += f" Sarà muto per {durata_ore} ora{'e' if durata_ore != 1 else ''}."
+            messaggio += f" Sarà muto per {durata_ore} {'ora' if durata_ore == 1 else 'ore'}."
         except:
             messaggio += " ⚠️ Non è stato possibile applicare il mute."
 
@@ -93,7 +96,10 @@ async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(messaggio)
 
 async def annullapianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not await is_admin(update) or not update.message.reply_to_message or è_bot(update):
+    if not await is_admin(update) or not update.message.reply_to_message:
+        return
+    if è_bot(update):
+        await update.message.reply_text("⚠️ Questo comando non può essere usato su un bot.")
         return
 
     chat_id = str(update.effective_chat.id)
@@ -108,13 +114,11 @@ async def annullapianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if dati[user_id]["pianti"] > 0:
         dati[user_id]["pianti"] -= 1
-    else:
-        dati[user_id]["pianti"] = 0
 
     salva_dati(chat_id, dati)
 
     await update.message.reply_text(
-        f"Pianto annullato per {nome}. Ora ha {dati[user_id]['pianti']} pianto{'i' if dati[user_id]['pianti'] != 1 else ''} su {dati[user_id]['soglia']}."
+        f"Pianto annullato per {nome}. Ora ha {dati[user_id]['pianti']} piant{'o' if dati[user_id]['pianti'] == 1 else 'i'} su {dati[user_id]['soglia']}."
     )
 
 async def riepilogopianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -125,14 +129,14 @@ async def riepilogopianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Nessuno ha ancora pianto.")
         return
 
-    riepilogo = "📊 Riepilogo Pianti Attuali:\n"
+    riepilogo = "📊 Riepilogo pianti attuali:\n"
     for user_id, info in dati.items():
         try:
             user = await context.bot.get_chat_member(update.effective_chat.id, int(user_id))
             nome = user.user.first_name
         except:
             nome = "Utente sconosciuto"
-        riepilogo += f"{nome}: {info['pianti']} pianto{'i' if info['pianti'] != 1 else ''} (soglia {info['soglia']})\n"
+        riepilogo += f"{nome}: {info['pianti']} piant{'o' if info['pianti'] == 1 else 'i'} (soglia {info['soglia']})\n"
 
     await update.message.reply_text(riepilogo)
 
@@ -167,7 +171,10 @@ async def resetpianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(messaggio, parse_mode="HTML")
 
 async def impostasoglia(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not await is_admin(update) or not update.message.reply_to_message or è_bot(update):
+    if not await is_admin(update) or not update.message.reply_to_message:
+        return
+    if è_bot(update):
+        await update.message.reply_text("⚠️ Questo comando non può essere usato su un bot.")
         return
 
     if not context.args or not context.args[0].isdigit():
@@ -188,7 +195,7 @@ async def impostasoglia(update: Update, context: ContextTypes.DEFAULT_TYPE):
         dati[user_id]["soglia"] = nuova_soglia
 
     salva_dati(chat_id, dati)
-    await update.message.reply_text(f"Nuova soglia impostata per {nome}: {nuova_soglia} pianto{'i' if nuova_soglia != 1 else ''}.")
+    await update.message.reply_text(f"Nuova soglia impostata per {nome}: {nuova_soglia} piant{'o' if nuova_soglia == 1 else 'i'}.")
 
 # === AVVIO BOT ===
 
@@ -211,7 +218,6 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     keep_alive()
 
-    import asyncio
     loop = asyncio.get_event_loop()
     loop.create_task(main())
     loop.run_forever()
