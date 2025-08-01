@@ -71,7 +71,7 @@ async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pianti = dati[user_id]["pianti"]
     soglia = dati[user_id]["soglia"]
 
-    messaggio = f"{nome} ha pianto {pianti} volta{'e' if pianti != 1 else ''}."
+    messaggio = f"{nome} ha pianto {pianti} {'volta' if pianti == 1 else 'volte'}."
 
     if pianti == soglia:
         messaggio += f" {nome} ha terminato i pianti a disposizione."
@@ -118,7 +118,7 @@ async def annullapianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     salva_dati(chat_id, dati)
 
     await update.message.reply_text(
-        f"Pianto annullato per {nome}. Ora ha {dati[user_id]['pianti']} piant{'o' if dati[user_id]['pianti'] == 1 else 'i'} su {dati[user_id]['soglia']}."
+        f"Pianto annullato per {nome}. Ora ha {dati[user_id]['pianti']} {'pianto' if dati[user_id]['pianti'] == 1 else 'pianti'} su {dati[user_id]['soglia']}."
     )
 
 async def riepilogopianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -136,7 +136,7 @@ async def riepilogopianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
             nome = user.user.first_name
         except:
             nome = "Utente sconosciuto"
-        riepilogo += f"{nome}: {info['pianti']} piant{'o' if info['pianti'] == 1 else 'i'} (soglia {info['soglia']})\n"
+        riepilogo += f"{nome}: {info['pianti']} {'pianto' if info['pianti'] == 1 else 'pianti'} (soglia {info['soglia']})\n"
 
     await update.message.reply_text(riepilogo)
 
@@ -195,7 +195,7 @@ async def impostasoglia(update: Update, context: ContextTypes.DEFAULT_TYPE):
         dati[user_id]["soglia"] = nuova_soglia
 
     salva_dati(chat_id, dati)
-    await update.message.reply_text(f"Nuova soglia impostata per {nome}: {nuova_soglia} piant{'o' if nuova_soglia == 1 else 'i'}.")
+    await update.message.reply_text(f"Nuova soglia impostata per {nome}: {nuova_soglia} {'pianto' if nuova_soglia == 1 else 'pianti'}.")
 
 # === AVVIO BOT ===
 
