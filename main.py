@@ -1,6 +1,7 @@
 import json
 import os
 import logging
+import asyncio
 from datetime import datetime, timedelta
 from telegram import Update, ChatPermissions
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
@@ -12,6 +13,8 @@ SOGLIA_INIZIALE = 20
 STATS_DIR = "dati_gruppi"
 
 os.makedirs(STATS_DIR, exist_ok=True)
+
+# === FUNZIONI DI GESTIONE FILE ===
 
 def get_stats_file(chat_id):
     return os.path.join(STATS_DIR, f"{chat_id}.json")
@@ -42,6 +45,8 @@ def è_bot(update: Update):
     user = update.message.reply_to_message.from_user
     return user.is_bot
 
+# === COMANDI ===
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("🤖 Ciao! Sono il Piantometro. Conteggio e gestisco i pianti nel gruppo. Scrivi /riepilogopianti per iniziare!")
 
@@ -66,7 +71,7 @@ async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pianti = dati[user_id]["pianti"]
     soglia = dati[user_id]["soglia"]
 
-    messaggio = f"{nome} ha pianto {pianti} volta{'e' if pianti != 1 else ''}."
+    messaggio = f"{nome} ha pianto {pianti} volte."
 
     if pianti == soglia:
         messaggio += f" {nome} ha terminato i pianti a disposizione."
@@ -83,7 +88,7 @@ async def pianto(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ChatPermissions(can_send_messages=False),
                 until_date=until_date,
             )
-            messaggio += f" Sarà muto per {durata_ore} or{'a' if durata_ore == 1 else 'e'}."
+            messaggio += f" Sarà mutato per {durata_ore} ore."
         except:
             messaggio += " ⚠️ Non è stato possibile applicare il mute."
 
@@ -131,7 +136,7 @@ async def riepilogopianti(update: Update, context: ContextTypes.DEFAULT_TYPE):
             nome = user.user.first_name
         except:
             nome = "Utente sconosciuto"
-        riepilogo += f"{nome}: {info['pianti']} piant{'o' if info['pianti'] == 1 else 'i'} (sogli{'a' if info['soglia'] == 1 else 'e'} {info['soglia']})\n"
+        riepilogo += f"{nome}: {info['pianti']} piant{'o' if info['pianti'] == 1 else 'i'} (soglia {info['soglia']})\n"
 
     await update.message.reply_text(riepilogo)
 
