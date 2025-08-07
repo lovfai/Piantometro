@@ -8,7 +8,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from telegram.constants import ChatMemberStatus
 from keep_alive import keep_alive
 
-TOKEN = "8349278486:AAEmkSGmlH71pbRjGlEd3sQcNwxgm5CEN90"
+TOKEN = "8349278486:AAFWUFdkSfRCpaQRJ-nJvuI_mf9qfFmLYa0"
 SOGLIA_INIZIALE = 20
 STATS_DIR = "dati_gruppi"
 
