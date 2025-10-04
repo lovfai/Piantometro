@@ -9,28 +9,39 @@ from telegram.constants import ChatMemberStatus
 from keep_alive import keep_alive
 
 from dotenv import load_dotenv
+from pymongo import MongoClient
+
+# === CONFIG ===
 load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
+MONGO_URI = os.getenv("MONGODB_URI")  # la URI che hai messo su Render
 SOGLIA_INIZIALE = 20
-STATS_DIR = "dati_gruppi"
 
-os.makedirs(STATS_DIR, exist_ok=True)
+# Connessione a MongoDB
+client = MongoClient(MONGO_URI)
+db = client["piantometro_db"]         # nome database
+collection = db["stats"]              # nome collection
 
-# === FUNZIONI DI GESTIONE FILE ===
 
-def get_stats_file(chat_id):
-    return os.path.join(STATS_DIR, f"{chat_id}.json")
+# === FUNZIONI DB ===
 
 def salva_dati(chat_id, dati):
-    with open(get_stats_file(chat_id), "w") as f:
-        json.dump(dati, f)
+    """Salva i dati di un gruppo su MongoDB"""
+    collection.update_one(
+        {"chat_id": chat_id},
+        {"$set": {"dati": dati}},
+        upsert=True
+    )
 
 def carica_dati(chat_id):
-    path = get_stats_file(chat_id)
-    if os.path.exists(path):
-        with open(path, "r") as f:
-            return json.load(f)
+    """Carica i dati di un gruppo da MongoDB"""
+    doc = collection.find_one({"chat_id": chat_id})
+    if doc and "dati" in doc:
+        return doc["dati"]
     return {}
+
+
+# === UTILS ===
 
 def fibonacci(n):
     a, b = 1, 1
@@ -49,6 +60,7 @@ async def is_admin(update: Update) -> bool:
 def è_bot(update: Update):
     user = update.message.reply_to_message.from_user
     return user.is_bot
+
 
 # === COMANDI ===
 
@@ -201,6 +213,7 @@ async def impostasoglia(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     salva_dati(chat_id, dati)
     await update.message.reply_text(f"Nuova soglia impostata per {nome}: {nuova_soglia} piant{'o' if nuova_soglia == 1 else 'i'}.")
+
 
 # === AVVIO BOT ===
 

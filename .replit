@@ -1,2 +1,5 @@
 [nix]
 packages = ["python39Packages.pip"]
+
+[agent]
+expertMode = true
