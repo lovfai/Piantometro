@@ -14,7 +14,7 @@ from pymongo import MongoClient
 # === CONFIG ===
 load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
-MONGO_URI = os.getenv("MONGODB_URI")  # la URI che hai messo su Render
+MONGO_URI = os.getenv("MONGO_URI")  # la URI che hai messo su Render
 SOGLIA_INIZIALE = 20
 
 # Connessione a MongoDB
